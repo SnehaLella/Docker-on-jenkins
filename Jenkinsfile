@@ -1,40 +1,26 @@
-pipeline{
-
-    agent any 
-	
-	 tools {  
-	  maven 'Maven 3.6.0'  
-	}
-    
-    stages{
-	
-        stage('scm clone'){
-            steps{
-            git branch: 'main', 
-			credentialsId: 'SnehaLellasneha-9121806763', 
-			url: 'https://github.com/SnehaLella/Docker-on-jenkins.git'
-            }
+pipeline {
+  environment {
+    registry = '289987706411.dkr.ecr.us-east-1.amazonaws.com/jenkins'
+    registryCredential = '289987706411'
+    dockerImage = ''
+  }
+  agent any
+  stages {
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
         }
-        stage('build image'){
-            steps{
-                sh "docker build . -t hello-world:${BUILD_NUMBER}"
-            }
-        }
-		
-		stage('Deploy to ECR'){
-            steps{
-               script{
-			   docker.withRegistry(
-			   'https://289987706411.dkr.ecr.us-east-1.amazonaws.com',
-			   'ecr:us-east-1:289987706411'){
-			   def myImage = docker.build('jenkins')
-			   myImage.push('v2')
-			   
-            }
-        }
-        
-        
+      }
     }
-}
-}
+    stage('Deploy image') {
+        steps{
+            script{
+                docker.withRegistry("https://" + registry, "ecr:eu-central-1:" + registryCredential) {
+                    dockerImage.push()
+                }
+            }
+        }
+    }
+  }
 }
