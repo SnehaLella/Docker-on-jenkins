@@ -20,21 +20,19 @@ pipeline{
                 sh "docker build . -t hello-world:${BUILD_NUMBER}"
             }
         }
-        stage('login to ecr'){
-           steps{
-               script{
-               sh "aws ecr get-login-password --region us-east-1 |docker login --username AWS --password-stdin 289987706411.dkr.ecr.us-east-1.amazonaws.com/jenkins:latest" 
-               }
-           }
-       }
-        stage('push to ecr'){
+		
+		stage('Deploy to ECR'){
             steps{
-                script{
-                    sh "docker tag hello-world:${BUILD_NUMBER} 289987706411.dkr.ecr.us-east-1.amazonaws.com/jenkins:latest"
-                    sh "docker push 289987706411.dkr.ecr.us-east-1.amazonaws.com/jenkins:latest "
-                }
+               script{
+			   docker.withRegistry(
+			   'https://289987706411.dkr.ecr.us-east-1.amazonaws.com',
+			   'ecr: us-east-1:289987706411'){
+			   def myImage = docker.build('jenkins')
+			   myImage.push('v2')
+			   
             }
         }
+        
         
     }
 }
