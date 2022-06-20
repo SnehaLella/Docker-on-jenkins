@@ -10,7 +10,7 @@ pipeline {
             steps{
             git branch: 'main', 
 			credentialsId: 'SnehaLellasneha-9121806763', 
-			url: 'https://github.com/SnehaLella/Jenkins.git'
+			url: 'https://github.com/SnehaLella/Docker-on-jenkins.git'
             }
         }
     stage('Building image') {
