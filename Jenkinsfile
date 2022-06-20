@@ -26,7 +26,7 @@ pipeline{
                script{
 			   docker.withRegistry(
 			   'https://289987706411.dkr.ecr.us-east-1.amazonaws.com',
-			   'ecr: us-east-1:289987706411'){
+			   'ecr:us-east-1:289987706411'){
 			   def myImage = docker.build('jenkins')
 			   myImage.push('v2')
 			   
